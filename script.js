@@ -219,6 +219,151 @@ renderDesignGrid("strategyBlocksGrid", offerData.strategyBlocks);
 renderBusinessResults("benefitsList", offerData.benefits);
 renderDesignGrid("designGrid", offerData.strategy);
 
+// Energy particles
+(function () {
+    const canvas = document.getElementById("energyParticles");
+    if (!canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    const blobs = document.querySelectorAll(".blob");
+    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const pointer = {
+        x: window.innerWidth / 2,
+        y: window.innerHeight / 2,
+        active: false,
+        px: 0,
+        py: 0
+    };
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    let particles = [];
+    let animationId = null;
+
+    function createParticle() {
+        return {
+            x: Math.random() * width,
+            y: Math.random() * height,
+            originX: Math.random() * width,
+            originY: Math.random() * height,
+            vx: (Math.random() - 0.5) * 0.18,
+            vy: (Math.random() - 0.5) * 0.18,
+            size: Math.random() * 1.8 + 0.7,
+            glow: Math.random() * 0.55 + 0.35,
+            hue: Math.random() > 0.45 ? 205 : 155
+        };
+    }
+
+    function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        canvas.style.width = width + "px";
+        canvas.style.height = height + "px";
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+        const particleCount = reducedMotion ? 32 : Math.min(110, Math.max(54, Math.floor(width / 16)));
+        particles = Array.from({ length: particleCount }, createParticle);
+    }
+
+    function updatePointer(x, y) {
+        pointer.x = x;
+        pointer.y = y;
+        pointer.active = true;
+        pointer.px = (x / width - 0.5) * 2;
+        pointer.py = (y / height - 0.5) * 2;
+
+        blobs.forEach(function (blob, index) {
+            const depth = (index + 1) * 10;
+            blob.style.setProperty("--parallax-x", `${pointer.px * depth}px`);
+            blob.style.setProperty("--parallax-y", `${pointer.py * depth}px`);
+        });
+    }
+
+    function drawParticle(particle) {
+        const gradient = ctx.createRadialGradient(
+            particle.x,
+            particle.y,
+            0,
+            particle.x,
+            particle.y,
+            particle.size * 5
+        );
+        gradient.addColorStop(0, `hsla(${particle.hue}, 95%, 78%, ${particle.glow})`);
+        gradient.addColorStop(1, `hsla(${particle.hue}, 95%, 55%, 0)`);
+
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size * 5, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = `hsla(${particle.hue}, 100%, 88%, ${particle.glow + 0.2})`;
+        ctx.beginPath();
+        ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+        ctx.fill();
+    }
+
+    function tick() {
+        ctx.clearRect(0, 0, width, height);
+
+        particles.forEach(function (particle) {
+            const dx = pointer.x - particle.x;
+            const dy = pointer.y - particle.y;
+            const distance = Math.sqrt(dx * dx + dy * dy) || 1;
+            const radius = pointer.active ? 220 : 0;
+
+            if (distance < radius) {
+                const force = (1 - distance / radius) * 0.18;
+                particle.vx += (dx / distance) * force;
+                particle.vy += (dy / distance) * force;
+            }
+
+            particle.vx += (particle.originX - particle.x) * 0.0007;
+            particle.vy += (particle.originY - particle.y) * 0.0007;
+            particle.vx *= 0.92;
+            particle.vy *= 0.92;
+            particle.x += particle.vx + pointer.px * 0.08;
+            particle.y += particle.vy + pointer.py * 0.08;
+
+            if (particle.x < -20 || particle.x > width + 20 || particle.y < -20 || particle.y > height + 20) {
+                particle.x = Math.random() * width;
+                particle.y = Math.random() * height;
+                particle.originX = particle.x;
+                particle.originY = particle.y;
+                particle.vx = 0;
+                particle.vy = 0;
+            }
+
+            drawParticle(particle);
+        });
+
+        animationId = requestAnimationFrame(tick);
+    }
+
+    window.addEventListener("pointermove", function (event) {
+        updatePointer(event.clientX, event.clientY);
+    }, { passive: true });
+    window.addEventListener("pointerleave", function () {
+        pointer.active = false;
+        pointer.px = 0;
+        pointer.py = 0;
+        blobs.forEach(function (blob) {
+            blob.style.setProperty("--parallax-x", "0px");
+            blob.style.setProperty("--parallax-y", "0px");
+        });
+    });
+    window.addEventListener("resize", resize);
+
+    resize();
+    animationId = requestAnimationFrame(tick);
+
+    window.addEventListener("beforeunload", function () {
+        if (animationId) cancelAnimationFrame(animationId);
+    });
+}());
+
 // Lightbox
 (function () {
     const lightbox = document.getElementById("lightbox");

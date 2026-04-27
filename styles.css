@@ -34,7 +34,18 @@ body {
     background: #050505;
 }
 
+.energy-particles {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    opacity: 0.9;
+}
+
 .blob {
+    --parallax-x: 0px;
+    --parallax-y: 0px;
     position: absolute;
     border-radius: 50%;
     filter: blur(80px);
@@ -72,11 +83,11 @@ body {
 
     0%,
     100% {
-        transform: translateY(0) scale(1);
+        transform: translate3d(var(--parallax-x), var(--parallax-y), 0) translateY(0) scale(1);
     }
 
     50% {
-        transform: translateY(-30px) scale(1.05);
+        transform: translate3d(var(--parallax-x), var(--parallax-y), 0) translateY(-30px) scale(1.05);
     }
 }
 
@@ -199,9 +210,11 @@ footer[id] {
     .site-nav {
         flex-wrap: wrap;
     }
+
     .site-nav__toggle {
         display: flex;
     }
+
     .site-nav__list {
         flex-basis: 100%;
         flex-direction: column;
@@ -210,10 +223,12 @@ footer[id] {
         overflow: hidden;
         transition: max-height 0.3s ease;
     }
+
     .site-nav__list.open {
         max-height: 500px;
         padding-top: 8px;
     }
+
     .site-nav__list a {
         display: block;
         padding: 10px 12px;
@@ -832,10 +847,23 @@ h2 {
 }
 
 @keyframes leakDot {
-    0% { left: 0; opacity: 0; }
-    10% { opacity: 1; }
-    90% { opacity: 1; }
-    100% { left: 100%; opacity: 0; }
+    0% {
+        left: 0;
+        opacity: 0;
+    }
+
+    10% {
+        opacity: 1;
+    }
+
+    90% {
+        opacity: 1;
+    }
+
+    100% {
+        left: 100%;
+        opacity: 0;
+    }
 }
 
 .leak-targets {
@@ -971,13 +999,16 @@ h2 {
         grid-template-columns: 1fr;
         text-align: center;
     }
+
     .leak-flow {
         transform: rotate(90deg);
         height: 50px;
     }
+
     .leak-compare {
         grid-template-columns: 1fr;
     }
+
     .leak-node {
         width: 100%;
     }
