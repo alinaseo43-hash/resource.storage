@@ -238,7 +238,8 @@ renderDesignGrid("designGrid", offerData.strategy);
     let height = 0;
     let dpr = 1;
     let particles = [];
-    let animationId = null;
+    let intervalId = null;
+    let frameCount = 0;
 
     function createParticle() {
         return {
@@ -266,6 +267,7 @@ renderDesignGrid("designGrid", offerData.strategy);
 
         const particleCount = reducedMotion ? 32 : Math.min(110, Math.max(54, Math.floor(width / 16)));
         particles = Array.from({ length: particleCount }, createParticle);
+        canvas.dataset.particles = String(particleCount);
     }
 
     function updatePointer(x, y) {
@@ -307,6 +309,8 @@ renderDesignGrid("designGrid", offerData.strategy);
 
     function tick() {
         ctx.clearRect(0, 0, width, height);
+        frameCount += 1;
+        canvas.dataset.frames = String(frameCount);
 
         particles.forEach(function (particle) {
             const dx = pointer.x - particle.x;
@@ -338,8 +342,6 @@ renderDesignGrid("designGrid", offerData.strategy);
 
             drawParticle(particle);
         });
-
-        animationId = requestAnimationFrame(tick);
     }
 
     window.addEventListener("pointermove", function (event) {
@@ -357,10 +359,11 @@ renderDesignGrid("designGrid", offerData.strategy);
     window.addEventListener("resize", resize);
 
     resize();
-    animationId = requestAnimationFrame(tick);
+    tick();
+    intervalId = window.setInterval(tick, reducedMotion ? 80 : 32);
 
     window.addEventListener("beforeunload", function () {
-        if (animationId) cancelAnimationFrame(animationId);
+        if (intervalId) window.clearInterval(intervalId);
     });
 }());
 
