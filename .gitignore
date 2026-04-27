@@ -1,0 +1,7 @@
+node_modules/
+*.pdf
+*.traineddata
+extracted_*.txt
+extract_pdf*.py
+package.json
+package-lock.json
