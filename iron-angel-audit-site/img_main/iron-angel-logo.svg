@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="430" height="134" viewBox="0 0 430 134" role="img" aria-labelledby="title">
+    <title id="title">Iron Angel</title>
+    <rect width="430" height="134" fill="#8dc63f"/>
+    <rect x="192" y="7" width="229" height="120" fill="#ffffff"/>
+    <g fill="#ffffff" font-family="Arial Black, Impact, sans-serif" font-size="82" font-weight="900">
+        <text x="20" y="94" textLength="152" lengthAdjust="spacingAndGlyphs">IRON</text>
+    </g>
+    <g fill="#006837" font-family="Arial Black, Impact, sans-serif" font-size="82" font-weight="900">
+        <text x="208" y="94" textLength="193" lengthAdjust="spacingAndGlyphs">ANGEL</text>
+    </g>
+</svg>
